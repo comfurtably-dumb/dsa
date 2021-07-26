@@ -95,6 +95,7 @@ public class Sequence<X> {
             return;
         } 
         if (sortType.equals("inserion")) {
+            this.insertionSort(order);
             return;
         } 
         if (sortType.equals("bubble")) {
@@ -144,8 +145,33 @@ public class Sequence<X> {
                 }
             }
             X temp = this.mainSequence.get(i);
-            this.mainSequence.add(i, currentOrderElement);
-            this.mainSequence.add(currentOrderElementIndex, temp);
+            this.mainSequence.set(i, currentOrderElement);
+            this.mainSequence.set(currentOrderElementIndex, temp);
+        }
+    }
+
+    //Insertion Sort
+    private void insertionSort (boolean order) throws Excpetion {
+        for (int i = 1; i < this.sequenceSize; i++) {
+            X elementToInsert = this.mainSequence.get(i);
+            int j;
+            for (j = i - 1; j > -1; j--) {
+                X currentElement = this.mainSequence.get(j);
+                if (order) {
+                    if (currentElement.compareWith(elementToInsert) == -1) {
+                        break;
+                    }
+                } else {
+                    if (currentElement.compareWith(elementToInsert) == 1) {
+                        break;
+                    }
+                }
+            }
+            int insertIndex = j + 1;
+            for (int k = i - 1; k >= insertIndex; k--) {
+                this.mainSequence.set(k + 1, this.mainSequence.get(k));
+            }
+            this.mainSequence.set(insertIndex, elementToInsert);
         }
     }
 
