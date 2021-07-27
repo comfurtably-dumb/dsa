@@ -1,6 +1,8 @@
 //import java.lang.*;
 import java.util.ArrayList;
 
+import javax.sound.midi.spi.MidiFileReader;
+
 public class Sequence<X> {
     
     /*Data Members*/
@@ -102,7 +104,8 @@ public class Sequence<X> {
             this.bubbleSort(order);
             return;
         } 
-        if (sortType.equals("binary_inserion")) {
+        if (sortType.equals("binary_insertion")) {
+            this.binaryInsertionSort(order);
             return;
         } 
         if (sortType.equals("heap")) {
@@ -125,6 +128,31 @@ public class Sequence<X> {
     }
 
     /*Private Utility*/
+    //Binary Search Index
+    private int binarySearchIndex (X elementToSearch, int startIndex, int endIndex, boolean order) {
+        int middleIndex = 0;
+        while (startIndex <= endIndex) {
+            middleIndex = startIndex + (endIndex - startIndex)/2;
+            X middleElement = this.mainSequence.get(middleIndex);
+            if (elementToSearch.compareWith(middleElement) == -1) {
+                if (order) {
+                    endIndex = middleIndex - 1;
+                } else {
+                    startIndex = middleIndex + 1;
+                }
+            } else if (elementToSearch.compareWith(middleElement) == 1) {
+                if (order) {
+                    startIndex = middleIndex + 1;
+                } else {
+                    endIndex = middleIndex - 1;
+                }
+            } else {
+                return middleIndex;
+            }
+        }
+        return middleIndex;
+    }
+
     //Selection Sort
     private void selectionSort (boolean order) {
         for (int i = 0; i < this.sequenceSize; i++) {
@@ -196,6 +224,18 @@ public class Sequence<X> {
                     }
                 }
             }
+        }
+    }
+
+    //Binary Insertion Sort
+    private void binaryInsertionSort (boolean order) {
+        for (int i = 1; i < this.sequenceSize; i++) {
+            X elementToInsert = this.mainSequence.get(i);
+            int insertIndex = this.binarySearchIndex(elementToInsert, 0, i - 1, order);
+            for (int k = i - 1; k >= insertIndex; k--) {
+                this.mainSequence.set(k + 1, this.mainSequence.get(k));
+            }
+            this.mainSequence.set(insertIndex, elementToInsert);
         }
     }
 
