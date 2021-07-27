@@ -180,7 +180,7 @@ public class Sequence<X> {
     }
 
     //Insertion Sort
-    private void insertionSort (boolean order) throws Excpetion {
+    private void insertionSort (boolean order) {
         for (int i = 1; i < this.sequenceSize; i++) {
             X elementToInsert = this.mainSequence.get(i);
             int j;
