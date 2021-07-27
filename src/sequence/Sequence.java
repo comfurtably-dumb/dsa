@@ -51,7 +51,7 @@ public class Sequence<X> {
     }
 
     //Add
-    public void insertElementAt (X obj, int index) throws Exception {
+    public void insertElementAt (int index, X obj) throws Exception {
         if (!this.isFixedSize()) {
             this.sequenceSize++;
             if (this.sequenceSize > this.totalSize) {
@@ -99,6 +99,7 @@ public class Sequence<X> {
             return;
         } 
         if (sortType.equals("bubble")) {
+            this.bubbleSort(order);
             return;
         } 
         if (sortType.equals("binary_inserion")) {
@@ -172,6 +173,29 @@ public class Sequence<X> {
                 this.mainSequence.set(k + 1, this.mainSequence.get(k));
             }
             this.mainSequence.set(insertIndex, elementToInsert);
+        }
+    }
+
+    //Bubble Sort
+    private void bubbleSort (boolean order) {
+        for (int i = 1; i < this.sequenceSize; i++) {
+            for (int j = 0; j < this.sequence - i; j++) {
+                X currentElement = this.mainSequence.get(j);
+                X nextElement = this.mainSequence.get(j + 1);
+                if (order) {
+                    if (nextElement.compareWith(currentElement) == -1) {
+                        X temp = currentElement;
+                        this.mainSequence.set(j, nextElement);
+                        this.mainSequence.set(j + 1, currentElement);
+                    }
+                } else {
+                    if (nextElement.compareWith(currentElement) == 1) {
+                        X temp = currentElement;
+                        this.mainSequence.set(j, nextElement);
+                        this.mainSequence.set(j + 1, currentElement);
+                    }
+                }
+            }
         }
     }
 
