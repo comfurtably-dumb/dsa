@@ -13,7 +13,7 @@ public class Sequence <X extends Compare> {
     private String errorString;
 
     /*Methods*/
-    //Create with Initial Size and Resizeability
+    //Create
     Sequence (X initializationValue, int initialSize, boolean hasFixedSize) throws Exception {
         if (initialSize < 0) {
             this.errorString = "ERROR: Cannot initialize a Sequence of negative size";
