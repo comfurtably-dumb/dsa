@@ -1,9 +1,9 @@
-//import java.lang.*;
+package sequence;
+
 import java.util.ArrayList;
+import compare.Compare;
 
-import javax.sound.midi.spi.MidiFileReader;
-
-public class Sequence<X> {
+public class Sequence <X extends Compare> {
     
     /*Data Members*/
     private int sequenceSize;
@@ -13,8 +13,8 @@ public class Sequence<X> {
     private String errorString;
 
     /*Methods*/
-    //Create
-    Sequence (int initialSize, boolean hasFixedSize) throws Exception {
+    //Create with Initial Size and Resizeability
+    Sequence (X initializationValue, int initialSize, boolean hasFixedSize) throws Exception {
         if (initialSize < 0) {
             this.errorString = "ERROR: Cannot initialize a Sequence of negative size";
             throw new Exception(this.errorString);
@@ -30,7 +30,10 @@ public class Sequence<X> {
             this.totalSize = initialSize*3/2;
         }
         this.mainSequence = new ArrayList<X>(this.totalSize);
-    }
+        for (int i = 0; i < this.sequenceSize; i++) {
+            this.mainSequence.set(i, initializationValue);
+        }
+    } 
 
     //Retrieve
     public X getElementAt (int index) throws Exception {
@@ -88,7 +91,7 @@ public class Sequence<X> {
     }
 
     //Sort
-    public void sort (String sortType, boolean order) throws Excpetion {
+    public void sort (String sortType, boolean order) throws Exception {
         if (this.sequenceSize < 2) {
             return;
         }
@@ -109,6 +112,7 @@ public class Sequence<X> {
             return;
         } 
         if (sortType.equals("heap")) {
+            this.heapSort(order);
             return;
         } 
         if (sortType.equals("merge")) {
@@ -125,6 +129,16 @@ public class Sequence<X> {
     //Size
     public int getSize () {
         return this.sequenceSize;
+    }
+
+    //Reverse
+    public void reverse () {
+        for (int i = 0; i < (this.sequenceSize - 1)/2; i++) {
+            X temp = this.mainSequence.get(i);
+            int j = this.sequenceSize - i - 1;
+            this.mainSequence.set(i, this.mainSequence.get(j));
+            this.mainSequence.set(j, temp);
+        }
     }
 
     /*Private Utility*/
@@ -153,24 +167,79 @@ public class Sequence<X> {
         return middleIndex;
     }
 
+    //Heapify
+    private void heapify (boolean order) {
+        for (int i = 1; i < this.sequenceSize; i++) {
+            heapInsert(i, order);
+        }
+    }
+    
+    //Heap Insert
+    private void heapInsert (int currentHeapSize, boolean order) {
+        int orderCheckValue = order ? 1 : -1;
+        int j = currentHeapSize;
+        int k = (currentHeapSize - 1)/2;
+        while (k > -1) {
+            X elementToInsert = this.mainSequence.get(j);
+            X currentElement = this.mainSequence.get(k);
+            if (elementToInsert.compareWith(currentElement) == orderCheckValue) {
+                break;
+            }
+            this.mainSequence.set(j, currentElement);
+            this.mainSequence.set(k, elementToInsert);
+            j = k;
+            if (j == 0) {
+                break;
+            }
+            k = (k - 1)/2;
+        }
+    }
+
+    //Heap Pop
+    private X heapPop (int currentHeapSize, boolean order) {
+        int orderCheckValue = order ? -1 : 1;
+        X returnElement = this.mainSequence.get(0);
+        X lastElement = this.mainSequence.get(currentHeapSize - 1);
+        this.mainSequence.set(0, lastElement);
+        int j = 0;
+        int k = 1;
+        while (k < currentHeapSize - 1) {
+            X leftChild = this.mainSequence.get(k);
+            X rightChild = this.mainSequence.get(k + 1);
+            if (leftChild.compareWith(rightChild) == orderCheckValue) {
+                if (lastElement.compareWith(leftChild) == orderCheckValue) {
+                    this.mainSequence.set(k, lastElement);
+                    this.mainSequence.set(j, leftChild);
+                    j = k;
+                } else {
+                    break;
+                }
+            } else {
+                if (lastElement.compareWith(rightChild) == orderCheckValue) {
+                    k++;
+                    this.mainSequence.set(k, lastElement);
+                    this.mainSequence.set(j, leftChild);
+                    j = k;
+                } else {
+                    break;
+                }
+            }
+            k = 2*k + 1;
+        }
+        return returnElement;
+    } 
+
     //Selection Sort
     private void selectionSort (boolean order) {
+        int orderCheckValue = order ? 1 : -1;
         for (int i = 0; i < this.sequenceSize; i++) {
             X currentOrderElement = this.mainSequence.get(i);
             int currentOrderElementIndex = i;
             for (int j = i + 1; j < this.sequenceSize; j++) {
                 X currentElement = this.mainSequence.get(j);
-                if (order) {
-                    if (currentElement.compareWith(currentOrderElement) == -1) {
+                if (currentOrderElement.compareWith(currentElement) == orderCheckValue) {
                         currentOrderElement = currentElement;
                         currentOrderElementIndex = j;
-                    }
-                }
-                else {
-                    if (currentElement.compareWith(currentOrderElement) == 1) {
-                        currentOrderElement = currentElement;
-                        currentOrderElementIndex = j;
-                    }
                 }
             }
             X temp = this.mainSequence.get(i);
@@ -181,19 +250,14 @@ public class Sequence<X> {
 
     //Insertion Sort
     private void insertionSort (boolean order) {
+        int orderCheckValue = order ? 1 : -1;
         for (int i = 1; i < this.sequenceSize; i++) {
             X elementToInsert = this.mainSequence.get(i);
             int j;
             for (j = i - 1; j > -1; j--) {
                 X currentElement = this.mainSequence.get(j);
-                if (order) {
-                    if (currentElement.compareWith(elementToInsert) == -1) {
-                        break;
-                    }
-                } else {
-                    if (currentElement.compareWith(elementToInsert) == 1) {
-                        break;
-                    }
+                if (elementToInsert.compareWith(currentElement) == orderCheckValue) {
+                    break;
                 }
             }
             int insertIndex = j + 1;
@@ -206,22 +270,14 @@ public class Sequence<X> {
 
     //Bubble Sort
     private void bubbleSort (boolean order) {
+        int orderCheckValue = order ? -1 : 1;
         for (int i = 1; i < this.sequenceSize; i++) {
-            for (int j = 0; j < this.sequence - i; j++) {
+            for (int j = 0; j < this.sequenceSize - i; j++) {
                 X currentElement = this.mainSequence.get(j);
                 X nextElement = this.mainSequence.get(j + 1);
-                if (order) {
-                    if (nextElement.compareWith(currentElement) == -1) {
-                        X temp = currentElement;
-                        this.mainSequence.set(j, nextElement);
-                        this.mainSequence.set(j + 1, currentElement);
-                    }
-                } else {
-                    if (nextElement.compareWith(currentElement) == 1) {
-                        X temp = currentElement;
-                        this.mainSequence.set(j, nextElement);
-                        this.mainSequence.set(j + 1, currentElement);
-                    }
+                if (nextElement.compareWith(currentElement) == orderCheckValue) {
+                    this.mainSequence.set(j, nextElement);
+                    this.mainSequence.set(j + 1, currentElement);
                 }
             }
         }
@@ -236,6 +292,15 @@ public class Sequence<X> {
                 this.mainSequence.set(k + 1, this.mainSequence.get(k));
             }
             this.mainSequence.set(insertIndex, elementToInsert);
+        }
+    }
+
+    //Heap Sort
+    private void heapSort (boolean order) {
+        this.heapify(order);
+        for (int i = 0; i < this.sequenceSize - 1; i++) {
+            X poppedElement = this.heapPop(this.sequenceSize - i, order);
+            this.mainSequence.set(this.sequenceSize - i - 1, poppedElement);
         }
     }
 
