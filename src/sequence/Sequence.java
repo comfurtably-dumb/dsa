@@ -116,6 +116,7 @@ public class Sequence <X extends Compare> {
             return;
         } 
         if (sortType.equals("merge")) {
+            this.mergeSort(order);
             return;
         } 
         if (sortType.equals("quick")) {
@@ -218,7 +219,7 @@ public class Sequence <X extends Compare> {
                 if (lastElement.compareWith(rightChild) == orderCheckValue) {
                     k++;
                     this.mainSequence.set(k, lastElement);
-                    this.mainSequence.set(j, leftChild);
+                    this.mainSequence.set(j, rightChild);
                     j = k;
                 } else {
                     break;
@@ -227,7 +228,44 @@ public class Sequence <X extends Compare> {
             k = 2*k + 1;
         }
         return returnElement;
-    } 
+    }
+
+    //Split and Merge
+    private void splitAndMerge (int startIndex, int endIndex, boolean order) {
+        int orderCheckValue = order ? -1 : 1;
+        if (startIndex == endIndex) {
+            return;
+        }
+        int middleIndex = startIndex + (endIndex - startIndex)/2;
+        this.splitAndMerge(startIndex, middleIndex, order);
+        this.splitAndMerge(middleIndex + 1, endIndex, order);
+        int i = startIndex, j = middleIndex + 1, k = 0, currentSize = endIndex - startIndex + 1;
+        ArrayList<X> auxArray = new ArrayList<X>(currentSize);
+        while ((i <= middleIndex || j <= endIndex) && k < currentSize) {
+            if (i <= middleIndex && j <= endIndex) {
+                X iElement = this.mainSequence.get(i);
+                X jElement = this.mainSequence.get(j);
+                if (iElement.compareWith(jElement) == orderCheckValue) {
+                    auxArray.set(k, iElement);
+                    i++;
+                } else {
+                    auxArray.set(k, jElement);
+                    j++;
+                }
+            } else if (i > middleIndex && j <= endIndex) {
+                X jElement = this.mainSequence.get(j);
+                auxArray.set(k, jElement);
+                j++;
+            } else if (i <= middleIndex && j > endIndex) {
+                X iElement = this.mainSequence.get(i);
+                auxArray.set(k, iElement);
+            }
+            k++;
+            for (int p = 0; p < currentSize; p++) {
+                this.mainSequence.set(p, auxArray.get(p));
+            }
+        }
+    }
 
     //Selection Sort
     private void selectionSort (boolean order) {
@@ -302,6 +340,12 @@ public class Sequence <X extends Compare> {
             X poppedElement = this.heapPop(this.sequenceSize - i, order);
             this.mainSequence.set(this.sequenceSize - i - 1, poppedElement);
         }
+    }
+
+    //Merge Sort
+    private void mergeSort (boolean order) {
+        splitAndMerge(0, this.sequenceSize - 1, order);
+        return;
     }
 
     /*Error Handling*/
