@@ -2,6 +2,7 @@ package sequence;
 
 import java.util.ArrayList;
 import compare.Compare;
+import java.lang.Math;
 
 public class Sequence <X extends Compare> {
     
@@ -120,6 +121,7 @@ public class Sequence <X extends Compare> {
             return;
         } 
         if (sortType.equals("quick")) {
+            this.quickSort(order);
             return;
         }
         this.errorString = "ERROR: " + sortType + " is an invalid sort type";
@@ -267,6 +269,33 @@ public class Sequence <X extends Compare> {
         }
     }
 
+    //Pivot Position and Partition
+    private void pivotPositionAndPartition (int startIndex, int endIndex, boolean order) {
+        int orderCheckValue = order ? -1 : 1;
+        if (startIndex >= endIndex) {
+            return;
+        }
+        int pivotIndex = (int)Math.random()*(endIndex - startIndex) + startIndex;
+        X pivotElement = this.mainSequence.get(pivotIndex);
+        this.mainSequence.set(pivotIndex, this.mainSequence.get(startIndex));
+        this.mainSequence.set(startIndex, pivotElement);
+        int i = startIndex, j = endIndex;
+        while (i < j) {
+            do {
+                i++;
+            } while (pivotElement.compareWith(this.mainSequence.get(i)) == orderCheckValue);
+            do {
+                j--;
+            } while (pivotElement.compareWith(this.mainSequence.get(j)) == -orderCheckValue);
+            this.mainSequence.set(i, this.mainSequence.get(j));
+            this.mainSequence.set(j, this.mainSequence.get(i));
+        }
+        this.mainSequence.set(startIndex, this.mainSequence.get(j));
+        this.mainSequence.set(j, pivotElement);
+        this.pivotPositionAndPartition(startIndex, j, order);
+        this.pivotPositionAndPartition(j + 1, endIndex, order);
+    } 
+
     //Selection Sort
     private void selectionSort (boolean order) {
         int orderCheckValue = order ? 1 : -1;
@@ -344,8 +373,12 @@ public class Sequence <X extends Compare> {
 
     //Merge Sort
     private void mergeSort (boolean order) {
-        splitAndMerge(0, this.sequenceSize - 1, order);
-        return;
+        this.splitAndMerge(0, this.sequenceSize - 1, order);
+    }
+
+    //Quick Sort
+    private void quickSort (boolean order) {
+        this.pivotPositionAndPartition(0, this.sequenceSize, order);
     }
 
     /*Error Handling*/
