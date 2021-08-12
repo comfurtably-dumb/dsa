@@ -1,28 +1,30 @@
 package sequence;
 
 import java.util.ArrayList;
-import compare.Compare;
+import java.lang.Comparable;
 import java.lang.Math;
 
-public class Sequence <X extends Compare> {
+
+public class Sequence <X extends Comparable <X>> {
     
     /*Data Members*/
     private int sequenceSize;
     private ArrayList<X> mainSequence;
     private boolean hasFixedSize;
     private int totalSize;
-    private String errorString;
+    private final int capacity = 1000000;
 
     /*Methods*/
     //Create
     Sequence (X initializationValue, int initialSize, boolean hasFixedSize) throws Exception {
         if (initialSize < 0) {
-            this.errorString = "ERROR: Cannot initialize a Sequence of negative size";
-            throw new Exception(this.errorString);
+            throw new Exception("ERROR: Cannot initialize a Sequence of negative size");
         }
         if (initialSize == 0 && hasFixedSize) {
-            this.errorString = "ERROR: Cannot initialize a fixed size Sequence of size 0";
-            throw new Exception(this.errorString);
+            throw new Exception("ERROR: Cannot initialize a fixed size Sequence of size 0");
+        }
+        if (initialSize > this.capacity) {
+            throw new Exception("ERROR: Sequence Capacity exceeded");
         }
         this.sequenceSize = initialSize;
         this.totalSize = initialSize;
@@ -41,8 +43,7 @@ public class Sequence <X extends Compare> {
         if (this.checkIndex(index)) {
             return this.mainSequence.get(index);
         } else {
-            this.errorString = "ERROR: Index out of bounds for the Sequence";
-            throw new Exception(this.errorString);
+            throw new Exception("ERROR: Index out of bounds for the Sequence");
         }
     }
 
@@ -51,8 +52,7 @@ public class Sequence <X extends Compare> {
         if (this.checkIndex(index)) {
             this.mainSequence.set(index, obj);
         } else {
-            this.errorString = "ERROR: Index out of bounds for the Sequence";
-            throw new Exception(this.errorString);
+            throw new Exception("ERROR: Index out of bounds for the Sequence");
         } 
     }
 
@@ -60,6 +60,9 @@ public class Sequence <X extends Compare> {
     public void insertElementAt (int index, X obj) throws Exception {
         if (!this.isFixedSize()) {
             this.sequenceSize++;
+            if (this.sequenceSize > this.capacity) {
+                throw new Exception("ERROR: Sequence Capacity exceeded");
+            }
             if (this.sequenceSize > this.totalSize) {
                 this.totalSize = this.sequenceSize*3/2;
                 ArrayList<X> newSequence = new ArrayList<X>(this.totalSize);
@@ -73,8 +76,7 @@ public class Sequence <X extends Compare> {
             }
             this.mainSequence.set(index, obj);
         } else {
-            this.errorString = "ERROR: Cannot change size of a fixed size Sequence";
-            throw new Exception(this.errorString);
+            throw new Exception("ERROR: Cannot change size of a fixed size Sequence");
         }
     }
 
@@ -86,9 +88,39 @@ public class Sequence <X extends Compare> {
                 this.mainSequence.set(i - 1, this.mainSequence.get(i));
             }
         } else {
-            this.errorString = "ERROR: Cannot change size of a fixed size Sequence";
-            throw new Exception(this.errorString);
+            throw new Exception("ERROR: Cannot change size of a fixed size Sequence");
         }
+    }
+
+    //Search
+    public boolean searchElement (X elementToSearch) { 
+        for (int i = 0; i < this.sequenceSize; i++){
+            if (this.mainSequence.get(i).equals(elementToSearch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //Search first occurence
+    public int searchElementFirstIndex (X elementToSearch) {
+        for (int i = 0; i < this.sequenceSize; i++) {
+            if (this.mainSequence.get(i).equals(elementToSearch)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    //Search index
+    public ArrayList<Integer> searchElementIndices (X elementToSearch) {
+        ArrayList<Integer> indicesArray = new ArrayList<Integer>();
+        for (int i = 0; i < this.sequenceSize; i++) {
+            if (this.mainSequence.get(i).equals(elementToSearch)) {
+                indicesArray.add(i);
+            }
+        }
+        return indicesArray;
     }
 
     //Sort
@@ -123,9 +155,8 @@ public class Sequence <X extends Compare> {
         if (sortType.equals("quick")) {
             this.quickSort(order);
             return;
-        }
-        this.errorString = "ERROR: " + sortType + " is an invalid sort type";
-        throw new Exception(this.errorString);
+        };
+        throw new Exception("ERROR: " + sortType + " is an invalid sort type");
     }
 
     /*Public Utility*/
@@ -151,13 +182,13 @@ public class Sequence <X extends Compare> {
         while (startIndex <= endIndex) {
             middleIndex = startIndex + (endIndex - startIndex)/2;
             X middleElement = this.mainSequence.get(middleIndex);
-            if (elementToSearch.compareWith(middleElement) == -1) {
+            if (elementToSearch.compareTo(middleElement) == -1) {
                 if (order) {
                     endIndex = middleIndex - 1;
                 } else {
                     startIndex = middleIndex + 1;
                 }
-            } else if (elementToSearch.compareWith(middleElement) == 1) {
+            } else if (elementToSearch.compareTo(middleElement) == 1) {
                 if (order) {
                     startIndex = middleIndex + 1;
                 } else {
@@ -185,7 +216,7 @@ public class Sequence <X extends Compare> {
         while (k > -1) {
             X elementToInsert = this.mainSequence.get(j);
             X currentElement = this.mainSequence.get(k);
-            if (elementToInsert.compareWith(currentElement) == orderCheckValue) {
+            if (elementToInsert.compareTo(currentElement) == orderCheckValue) {
                 break;
             }
             this.mainSequence.set(j, currentElement);
@@ -209,8 +240,8 @@ public class Sequence <X extends Compare> {
         while (k < currentHeapSize - 1) {
             X leftChild = this.mainSequence.get(k);
             X rightChild = this.mainSequence.get(k + 1);
-            if (leftChild.compareWith(rightChild) == orderCheckValue) {
-                if (lastElement.compareWith(leftChild) == orderCheckValue) {
+            if (leftChild.compareTo(rightChild) == orderCheckValue) {
+                if (lastElement.compareTo(leftChild) == orderCheckValue) {
                     this.mainSequence.set(k, lastElement);
                     this.mainSequence.set(j, leftChild);
                     j = k;
@@ -218,7 +249,7 @@ public class Sequence <X extends Compare> {
                     break;
                 }
             } else {
-                if (lastElement.compareWith(rightChild) == orderCheckValue) {
+                if (lastElement.compareTo(rightChild) == orderCheckValue) {
                     k++;
                     this.mainSequence.set(k, lastElement);
                     this.mainSequence.set(j, rightChild);
@@ -247,7 +278,7 @@ public class Sequence <X extends Compare> {
             if (i <= middleIndex && j <= endIndex) {
                 X iElement = this.mainSequence.get(i);
                 X jElement = this.mainSequence.get(j);
-                if (iElement.compareWith(jElement) == orderCheckValue) {
+                if (iElement.compareTo(jElement) == orderCheckValue) {
                     auxArray.set(k, iElement);
                     i++;
                 } else {
@@ -283,10 +314,10 @@ public class Sequence <X extends Compare> {
         while (i < j) {
             do {
                 i++;
-            } while (pivotElement.compareWith(this.mainSequence.get(i)) == orderCheckValue);
+            } while (pivotElement.compareTo(this.mainSequence.get(i)) == orderCheckValue);
             do {
                 j--;
-            } while (pivotElement.compareWith(this.mainSequence.get(j)) == -orderCheckValue);
+            } while (pivotElement.compareTo(this.mainSequence.get(j)) == -orderCheckValue);
             this.mainSequence.set(i, this.mainSequence.get(j));
             this.mainSequence.set(j, this.mainSequence.get(i));
         }
@@ -304,7 +335,7 @@ public class Sequence <X extends Compare> {
             int currentOrderElementIndex = i;
             for (int j = i + 1; j < this.sequenceSize; j++) {
                 X currentElement = this.mainSequence.get(j);
-                if (currentOrderElement.compareWith(currentElement) == orderCheckValue) {
+                if (currentOrderElement.compareTo(currentElement) == orderCheckValue) {
                         currentOrderElement = currentElement;
                         currentOrderElementIndex = j;
                 }
@@ -323,7 +354,7 @@ public class Sequence <X extends Compare> {
             int j;
             for (j = i - 1; j > -1; j--) {
                 X currentElement = this.mainSequence.get(j);
-                if (elementToInsert.compareWith(currentElement) == orderCheckValue) {
+                if (elementToInsert.compareTo(currentElement) == orderCheckValue) {
                     break;
                 }
             }
@@ -342,7 +373,7 @@ public class Sequence <X extends Compare> {
             for (int j = 0; j < this.sequenceSize - i; j++) {
                 X currentElement = this.mainSequence.get(j);
                 X nextElement = this.mainSequence.get(j + 1);
-                if (nextElement.compareWith(currentElement) == orderCheckValue) {
+                if (nextElement.compareTo(currentElement) == orderCheckValue) {
                     this.mainSequence.set(j, nextElement);
                     this.mainSequence.set(j + 1, currentElement);
                 }
