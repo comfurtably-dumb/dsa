@@ -56,42 +56,6 @@ public class Sequence <X extends Comparable <X>> {
         } 
     }
 
-    //Add
-    public void insertElementAt (int index, X obj) throws Exception {
-        if (!this.isFixedSize()) {
-            this.sequenceSize++;
-            if (this.sequenceSize > this.capacity) {
-                throw new Exception("ERROR: Sequence Capacity exceeded");
-            }
-            if (this.sequenceSize > this.totalSize) {
-                this.totalSize = this.sequenceSize*3/2;
-                ArrayList<X> newSequence = new ArrayList<X>(this.totalSize);
-                for (int i = 0; i < this.sequenceSize; i++) {
-                    newSequence.set(i, this.mainSequence.get(i));
-                }
-                this.mainSequence = newSequence; 
-            }
-            for (int i = this.sequenceSize - 1; i > index; i--) {
-                this.mainSequence.set(i, this.mainSequence.get(i - 1));
-            }
-            this.mainSequence.set(index, obj);
-        } else {
-            throw new Exception("ERROR: Cannot change size of a fixed size Sequence");
-        }
-    }
-
-    //Delete
-    public void deleteElementAt (int index) throws Exception {
-        if (!this.isFixedSize()) {
-            this.sequenceSize++;
-            for (int i = index + 1; i < this.sequenceSize; i++) {
-                this.mainSequence.set(i - 1, this.mainSequence.get(i));
-            }
-        } else {
-            throw new Exception("ERROR: Cannot change size of a fixed size Sequence");
-        }
-    }
-
     //Search
     public boolean searchElement (X elementToSearch) { 
         for (int i = 0; i < this.sequenceSize; i++){
@@ -121,6 +85,47 @@ public class Sequence <X extends Comparable <X>> {
             }
         }
         return indicesArray;
+    }
+
+    //Add
+    public void insertElementAt (int index, X obj) throws Exception {
+        if (!this.isFixedSize()) {
+            this.sequenceSize++;
+            if (this.sequenceSize > this.capacity) {
+                this.sequenceSize--;
+                throw new Exception("ERROR: Sequence Capacity exceeded");
+            }
+            if (this.sequenceSize > this.totalSize) {
+                this.totalSize = this.sequenceSize*3/2;
+                ArrayList<X> newSequence = new ArrayList<X>(this.totalSize);
+                for (int i = 0; i < this.sequenceSize; i++) {
+                    newSequence.set(i, this.mainSequence.get(i));
+                }
+                this.mainSequence = newSequence; 
+            }
+            for (int i = this.sequenceSize - 1; i > index; i--) {
+                this.mainSequence.set(i, this.mainSequence.get(i - 1));
+            }
+            this.mainSequence.set(index, obj);
+        } else {
+            throw new Exception("ERROR: Cannot change size of a fixed size Sequence");
+        }
+    }
+
+    //Delete
+    public void deleteElementAt (int index) throws Exception {
+        if (!this.isFixedSize()) {
+            this.sequenceSize--;
+            if (this.sequenceSize < 0) {
+                this.sequenceSize++;
+                throw new Exception("ERROR: Cannot delete from an empty Sequence");
+            }
+            for (int i = index + 1; i < this.sequenceSize; i++) {
+                this.mainSequence.set(i - 1, this.mainSequence.get(i));
+            }
+        } else {
+            throw new Exception("ERROR: Cannot change size of a fixed size Sequence");
+        }
     }
 
     //Sort
