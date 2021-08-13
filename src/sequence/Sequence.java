@@ -1,11 +1,42 @@
 package sequence;
 
 import java.util.ArrayList;
+import navigator.Navigator;
 import java.lang.Comparable;
 import java.lang.Math;
 
-
 public class Sequence <X extends Comparable <X>> {
+    
+    /*Inner Class*/
+    //Sequence Navigator
+    class SequenceNavigator extends Navigator<X> {
+        
+        /*Methods (Implementations)*/
+        //Constructor
+        public SequenceNavigator () {
+            super.size = Sequence.this.sequenceSize;
+        }
+
+        //Get next element
+        @Override
+        public X getNextElement () throws Exception {
+            if (this.hasNextElement()) {
+                this.currentIndex++;
+                return Sequence.this.mainSequence.get(currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+
+        //Get previous element
+        @Override
+        public X getPreviousElement () throws Exception {
+            if (this.hasPreviousElement()) {
+                this.currentIndex--;
+                return Sequence.this.mainSequence.get(currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+    }
     
     /*Data Members*/
     private int sequenceSize;
@@ -178,6 +209,11 @@ public class Sequence <X extends Comparable <X>> {
             this.mainSequence.set(i, this.mainSequence.get(j));
             this.mainSequence.set(j, temp);
         }
+    }
+
+    //Navigator
+    public SequenceNavigator createNavigator () {
+        return new SequenceNavigator();
     }
 
     /*Private Utility*/

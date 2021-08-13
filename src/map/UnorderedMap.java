@@ -1,14 +1,14 @@
 package map;
 
-import java.lang.Comparable;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import navigator.Navigator;
 
-public class UnorderedMap <K extends Comparable <K>, V extends Comparable <V>> {
+public class UnorderedMap <K, V> {
 
     /*Inner Class*/
-    //Key Class
-    class KeyValuePair {
+    //Key Value Pair Class
+    public class KeyValuePair {
 
         /*Data Members*/
         K keyObj;
@@ -35,6 +35,48 @@ public class UnorderedMap <K extends Comparable <K>, V extends Comparable <V>> {
             this.valueObj = valueObj;
         }
     }
+
+    //Navigator
+    public class UnorderedMapNavigator extends Navigator<KeyValuePair> {
+
+        /*Data Members*/
+        private ArrayList<KeyValuePair> navigatorList;
+
+        /*Methods*/
+        //Constructor
+        public UnorderedMapNavigator () {
+            super.size = UnorderedMap.this.mapSize;
+            this.navigatorList = new ArrayList<KeyValuePair>(this.size);
+            int navigatorListIndex = 0;
+            for (int i = 0; i < UnorderedMap.capacity; i++) {
+                LinkedList<KeyValuePair> keyValueList = UnorderedMap.this.mainTable.get(i);
+                for (KeyValuePair kvPair: keyValueList) {
+                    this.navigatorList.set(navigatorListIndex, kvPair);
+                    navigatorListIndex++;
+                }
+            }
+        }
+
+        //Get next element
+        @Override
+        public KeyValuePair getNextElement () throws Exception {
+            if (this.hasNextElement()) {
+                this.currentIndex++;
+                return this.navigatorList.get(currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+
+        //Get previous element
+        @Override
+        public KeyValuePair getPreviousElement () throws Exception {
+            if (this.hasPreviousElement()) {
+                this.currentIndex--;
+                return this.navigatorList.get(currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+    }
     
     /*Data Members*/
     private int mapSize;
@@ -43,7 +85,7 @@ public class UnorderedMap <K extends Comparable <K>, V extends Comparable <V>> {
 
     /*Methods*/
     //Create
-    UnorderedMap () {
+    public UnorderedMap () {
         this.mapSize = 0;
     }
 
@@ -167,10 +209,15 @@ public class UnorderedMap <K extends Comparable <K>, V extends Comparable <V>> {
         throw new Exception("ERROR: Key does not exist");
     }
 
-    /*Utils*/
+    /*Public Utility*/
     //Size
     public int getSize () {
         return this.mapSize;
     }
     
+    //Navigator
+    public UnorderedMapNavigator getNavigator () {
+        return new UnorderedMapNavigator();
+    }
+
 }
