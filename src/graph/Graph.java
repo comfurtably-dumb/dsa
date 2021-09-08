@@ -129,10 +129,21 @@ public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
         }
     }
 
+    /*Public Utility*/
+    //Size
+    public int getSize () {
+        return this.graphSize;
+    }
+
+    //Is Directed
+    public boolean isGraphDirected () {
+        return this.isDirected;
+    }
+
     /*Error Handling*/
     //ID out of bounds
     private boolean checkId (int id) {
-        if (id < 0 || id > this.graphSize) {
+        if (id < 0 || id >= this.graphSize) {
             return false;
         }
         return true;
