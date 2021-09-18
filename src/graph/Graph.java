@@ -14,7 +14,7 @@ public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
     private int graphSize;
     private ArrayList<Node<V, E>> nodeList;
     private boolean isDirected;
-    private static final int capacity = 1000;
+    private static int capacity = 1000;
 
     /*Methods*/
     //Create
@@ -58,8 +58,39 @@ public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
         nodeToUpdate.setVertex(node.getVertex());
     }
 
+    //Search
+    public boolean searchNode (Node<V, E> nodeToSearch) throws Exception {
+        for (int i = 0; i < this.graphSize; i++) {
+            if (nodeToSearch.equals(this.nodeList.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //Search first ID
+    public int searchFirstId (Node<V, E> nodeToSearch) {
+        for (int i = 0; i < this.graphSize; i++) {
+            if (nodeToSearch.equals(this.nodeList.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    //Search all IDs
+    public ArrayList<Integer> searchAllIds (Node<V, E> nodeToSearch) {
+        ArrayList<Integer> idList = new ArrayList<Integer>();
+        for (int i = 0; i < this.graphSize; i++) {
+            if (nodeToSearch.equals(this.nodeList.get(i))) {
+                idList.add(i);
+            }
+        }
+        return idList;
+    }
+
     //Add Node
-    public void addNode (Node<V, E> nodeToAdd) throws Exception {
+    final public void addNode (Node<V, E> nodeToAdd) throws Exception {
         this.graphSize++;
         if (this.graphSize > capacity) {
             this.graphSize--;
