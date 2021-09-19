@@ -2,9 +2,47 @@ package linklist;
 
 import deque.DequeInterface;
 import node.DequeNode;
+import navigator.Navigator;
 
 public class DequeList <X> implements DequeInterface<X> {
 
+    /*Inner Class*/
+    //LinkList Navigator
+    class DequeListNavigator extends Navigator<X> {
+
+        /*Data Members*/
+        private DequeNode<X> currentElement;
+        
+        /*Methods*/
+        //Constructor
+        public DequeListNavigator () {
+            super.size = DequeList.this.listSize;
+            this.currentElement = DequeList.this.head;
+        }
+
+        //Get next element
+        @Override
+        public X getNextElement() throws Exception {
+            if (this.hasNextElement()) {
+                this.currentIndex++;
+                this.currentElement = this.currentElement.getNext();
+                return this.currentElement.getData();
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+
+        //Get previous element 
+        @Override
+        public X getPreviousElement() throws Exception {
+            if (this.hasPreviousElement()) {
+                this.currentIndex--;
+                this.currentElement = this.currentElement.getPrevious();
+                return this.currentElement.getData();
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+    }
+    
     /*Data Members*/
     private DequeNode<X> head;
     private DequeNode<X> end;

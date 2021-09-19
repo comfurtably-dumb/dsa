@@ -8,9 +8,42 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import navigator.Navigator;
 
 public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
 
+    /*Inner Class*/
+    //Graph Navigator
+    class GraphNavigator extends Navigator<Node<V, E>> {
+        
+        /*Methods*/
+        //Constructor
+        public GraphNavigator () {
+            super.size = Graph.this.graphSize;
+        }
+
+        //Get next element
+        @Override
+        public Node<V, E> getNextElement() throws Exception {
+            if (this.hasNextElement()) {
+                this.currentIndex++;
+                return Graph.this.nodeList.get(this.currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+
+        //Get previous element
+        @Override
+        public Node<V, E> getPreviousElement() throws Exception {
+            if (this.hasPreviousElement()) {
+                this.currentIndex--;
+                return Graph.this.nodeList.get(this.currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+
+    }
+    
     /*Data Members*/
     protected int graphSize;
     protected ArrayList<Node<V, E>> nodeList;
@@ -177,6 +210,11 @@ public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
     //Is Directed
     public boolean isGraphDirected () {
         return this.isDirected;
+    }
+
+    //Navigator
+    public GraphNavigator createGraphNavigator () {
+        return new GraphNavigator();
     }
 
     /*Error Handling*/

@@ -1,9 +1,48 @@
 package linklist;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import navigator.Navigator;
 import node.LinearNode;
 
 public class LinkList <X extends Comparable<X>> {
+
+    /*Inner Class*/
+    //LinkList Navigator
+    class LinkListNavigator extends Navigator<X> {
+
+        /*Data Members*/
+        private LinearNode<X> currentElement;
+        
+        /*Methods*/
+        //Constructor
+        public LinkListNavigator () {
+            super.size = LinkList.this.listSize;
+            this.currentElement = LinkList.this.head;
+        }
+
+        //Get next element
+        @Override
+        public X getNextElement() throws Exception {
+            if (this.hasNextElement()) {
+                this.currentIndex++;
+                this.currentElement = this.currentElement.getNext();
+                return this.currentElement.getData();
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+
+        //Get previous element 
+        @Override
+        public X getPreviousElement() throws Exception {
+            if (this.hasPreviousElement()) {
+                this.currentIndex--;
+                this.currentElement = this.currentElement.getPrevious();
+                return this.currentElement.getData();
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+    }
 
     /*Data Members*/
     private LinearNode<X> head;
@@ -184,6 +223,65 @@ public class LinkList <X extends Comparable<X>> {
         }
     }
 
+    //Sort
+    public void sort (boolean order) {
+        ArrayList<X> array = new ArrayList<X>(this.listSize);
+        int index = 0;
+        LinearNode<X> currentNode = this.head;
+        while (currentNode != this.end) {
+            array.set(index, currentNode.getData());
+            index++;
+            currentNode = currentNode.getNext();
+        }
+        array.set(index, currentNode.getData());
+        Collections.sort(array);
+        if (!order) {
+            for (int i = 0; i < array.size()/2; i++) {
+                X temp = array.get(i);
+                array.set(i, array.get(array.size() - i - 1));
+                array.set(array.size() - i - 1, temp);
+            }
+        }
+        index = 0;
+        currentNode = this.head;
+        while (currentNode != this.end) {
+            currentNode.setData(array.get(index));
+            index++;
+            currentNode = currentNode.getNext();
+        }
+        currentNode.setData(array.get(index));
+    }
+
+    //Reverse
+    public void reverse () throws Exception {
+        if (this.listSize < 2) {
+            return;
+        }
+        LinearNode<X> previousNode = null;
+        LinearNode<X> currentNode = this.head;
+        LinearNode<X> nextNode = currentNode.getNext();
+        while (currentNode != this.end) {
+            if (currentNode != this.head) {
+                currentNode.setNext(previousNode);
+                if (!isSinglyLinked) {
+                    currentNode.setPrevious(nextNode);
+                }
+            }
+            previousNode = currentNode;
+            currentNode = nextNode;
+            nextNode = nextNode.getNext();
+        }
+        LinearNode<X> headNext = this.head.getNext();
+        LinearNode<X> endNext = this.end.getNext();
+        if (!isSinglyLinked) {
+            this.head.setPrevious(headNext);
+            this.end.setPrevious(endNext);
+        }
+        LinearNode<X> temp = this.head;
+        this.head = this.end;
+        this.end = temp; 
+    }
+
     /*Public Utility*/
     //Size
     public int getSize () {
@@ -198,6 +296,11 @@ public class LinkList <X extends Comparable<X>> {
     //Is Circular
     public boolean isListCircular () {
         return this.isCircular;
+    }
+
+    //Navigator
+    public LinkListNavigator createNavigator () {
+        return new LinkListNavigator();
     }
 
     /*Error Handling*/

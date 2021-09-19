@@ -5,7 +5,7 @@ import navigator.Navigator;
 import java.lang.Comparable;
 import java.lang.Math;
 
-public class Sequence <X extends Comparable <X>> {
+public class Sequence <X extends Comparable<X>> {
     
     /*Inner Class*/
     //Sequence Navigator

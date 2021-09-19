@@ -2,9 +2,41 @@ package graph;
 
 import java.util.HashMap;
 import java.util.Map;
+import navigator.Navigator;
 import node.Node;
 
 public class Tree <V extends Comparable<V>, E extends Comparable<E>> extends Graph<V, E> {
+    
+    /*Inner Class*/
+    //Tree Navigator
+    class TreeNavigator extends Navigator<Node<V, E>> {
+        
+        /*Methods*/
+        //Constructor
+        public TreeNavigator () {
+            super.size = Tree.this.graphSize;
+        }
+
+        //Get next element
+        @Override
+        public Node<V, E> getNextElement() throws Exception {
+            if (this.hasNextElement()) {
+                this.currentIndex++;
+                return Tree.this.nodeList.get(this.currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+
+        //Get previous element
+        @Override
+        public Node<V, E> getPreviousElement() throws Exception {
+            if (this.hasPreviousElement()) {
+                this.currentIndex--;
+                return Tree.this.nodeList.get(this.currentIndex);
+            }
+            throw new Exception("ERROR: Navigator out of bounds");
+        }
+    }
     
     /*Data Members*/
     private Node<V, E> root;
@@ -46,6 +78,12 @@ public class Tree <V extends Comparable<V>, E extends Comparable<E>> extends Gra
         if (super.graphSize == 0) {
             this.root = null;
         }
+    }
+
+    /*Public Utility*/
+    //Navigator
+    public TreeNavigator createTreeNavigator () {
+        return new TreeNavigator();
     }
 
     /*Private Utility*/
