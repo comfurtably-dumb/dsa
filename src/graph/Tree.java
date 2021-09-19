@@ -81,6 +81,11 @@ public class Tree <V extends Comparable<V>, E extends Comparable<E>> extends Gra
     }
 
     /*Public Utility*/
+    //Size
+    public int getSize () {
+        return super.graphSize;
+    }
+
     //Navigator
     public TreeNavigator createTreeNavigator () {
         return new TreeNavigator();
