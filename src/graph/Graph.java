@@ -4,6 +4,7 @@ import node.Node;
 import java.lang.Comparable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -11,8 +12,8 @@ import java.util.Queue;
 public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
 
     /*Data Members*/
-    private int graphSize;
-    private ArrayList<Node<V, E>> nodeList;
+    protected int graphSize;
+    protected ArrayList<Node<V, E>> nodeList;
     private boolean isDirected;
     private static int capacity = 1000;
 
@@ -90,7 +91,7 @@ public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
     }
 
     //Add Node
-    final public void addNode (Node<V, E> nodeToAdd) throws Exception {
+    public void addNode (Node<V, E> nodeToAdd) throws Exception {
         this.graphSize++;
         if (this.graphSize > capacity) {
             this.graphSize--;
@@ -107,25 +108,32 @@ public class Graph <V extends Comparable<V>, E extends Comparable<E>> {
             this.graphSize++;
             throw new Exception("ERROR: Cannot delete from an empty Graph");
         }
+        if (!this.checkId(id)) {
+            throw new Exception("ERROR: ID out of bounds");
+        }
         Queue<Integer> bfsQueue = new LinkedList<Integer>();
-        boolean[] visitedArray = new boolean[this.graphSize];
-        for (int i = 0; i < this.graphSize; i++) {
+        boolean[] visitedArray = new boolean[this.graphSize + 1];
+        for (int i = 0; i < this.graphSize + 1; i++) {
             bfsQueue.add(i);
             visitedArray[i] = true;
-            Node<V, E> currentNode = this.getNodeByID(id);
+            Node<V, E> currentNode = this.getNodeByID(i);
             while (!bfsQueue.isEmpty()) {
                 bfsQueue.poll();
-                for (Map.Entry<Integer, E> entry : currentNode.getConnections().entrySet()) {
+                HashMap<Integer, E> connectionMap = currentNode.getConnections();
+                Iterator<Map.Entry<Integer, E>> iterator = connectionMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Integer, E> entry = iterator.next();
                     int connectingId = entry.getKey();
                     if (connectingId != id && !visitedArray[connectingId]) {
                         bfsQueue.add(connectingId);
                         visitedArray[connectingId] = true;
                     } else if (connectingId == id) {
-                        currentNode.getConnections().remove(id);
+                        connectionMap.remove(id);
                     }
                 }
             }
         }
+        this.nodeList.remove(id);
     }
 
     //Add Connection from ID1 to ID2
